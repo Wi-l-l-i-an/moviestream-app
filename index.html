@@ -1,68 +1,290 @@
 
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MovieStream</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #111827;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --danger: #fb7185;
+      --border: rgba(148, 163, 184, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: radial-gradient(circle at top, rgba(56, 189, 248, 0.18), transparent 25%),
+                  linear-gradient(180deg, #020617 0%, #0f172a 100%);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .page {
+      width: min(100%, 980px);
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: clamp(2rem, 2.4vw, 3rem);
+      letter-spacing: -0.04em;
+    }
+
+    header p {
+      margin: 0;
+      color: var(--muted);
+      max-width: 500px;
+    }
+
+    .card {
+      background: rgba(15, 23, 42, 0.92);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 24px 60px rgba(15, 23, 42, 0.25);
+      margin-bottom: 24px;
+      backdrop-filter: blur(14px);
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    input,
+    button {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 16px;
+      font-size: 1rem;
+      color: var(--text);
+      background: #0b1121;
+    }
+
+    input::placeholder {
+      color: var(--muted);
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      background: var(--accent);
+      color: #020617;
+      font-weight: 700;
+      transition: transform 0.2s ease, filter 0.2s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 24px;
+    }
+
+    .movie-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 14px;
+    }
+
+    .movie-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 18px 20px;
+      border: 1px solid rgba(148, 163, 184, 0.12);
+      border-radius: 18px;
+      background: rgba(15, 23, 42, 0.7);
+    }
+
+    .movie-info {
+      display: grid;
+      gap: 6px;
+    }
+
+    .movie-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .movie-year {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .delete-button {
+      border: none;
+      border-radius: 12px;
+      padding: 10px 14px;
+      background: var(--danger);
+      color: white;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .delete-button:hover {
+      filter: brightness(1.05);
+    }
+
+    .section-title {
+      margin-top: 0;
+      margin-bottom: 16px;
+      font-size: 1.2rem;
+      letter-spacing: -0.03em;
+    }
+
+    .form-group {
+      display: grid;
+      gap: 12px;
+    }
+
+    footer {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      text-align: center;
+    }
+
+    @media (max-width: 768px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .controls {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
+  <div class="page">
+    <header>
+      <div>
+        <h1>MovieStream</h1>
+        <p>Administra tu catálogo de películas con búsqueda rápida, creación y eliminación desde una interfaz limpia.</p>
+      </div>
+    </header>
 
-<h1>Movies</h1>
+    <div class="card">
+      <div class="section-title">Buscar películas</div>
+      <div class="controls">
+        <input id="search" placeholder="Busca por título...">
+        <button onclick="loadMovies()">Buscar</button>
+      </div>
+      <ul id="movies" class="movie-list"></ul>
+    </div>
 
-<input id="search" placeholder="Buscar película">
-<button onclick="loadMovies()">Buscar</button>
+    <div class="grid">
+      <div class="card">
+        <div class="section-title">Agregar película</div>
+        <div class="form-group">
+          <input id="title" placeholder="Título">
+          <input id="year" type="number" placeholder="Año">
+          <button onclick="addMovie()">Agregar película</button>
+        </div>
+      </div>
 
-<ul id="movies"></ul>
+      <div class="card">
+        <div class="section-title">Consejos rápidos</div>
+        <p>Usa el botón de búsqueda para filtrar por título. Las películas agregadas tienen un género por defecto <strong>Action</strong>, pero puedes ampliar el formulario si quieres agregar más campos.</p>
+      </div>
+    </div>
 
-<h2>Agregar película</h2>
-<input id="title" placeholder="Title">
-<input id="year" placeholder="Year">
-<button onclick="addMovie()">Agregar</button>
+    <footer>Interfaz creada para tu proyecto de base de datos NoSQL.</footer>
+  </div>
 
-<script>
-const API = "";
+  <script>
+    const API = "";
 
-async function loadMovies() {
-  const search = document.getElementById("search").value;
-  const res = await fetch(`${API}/movies?title=${search}`);
-  const data = await res.json();
+    async function loadMovies() {
+      const search = document.getElementById("search").value;
+      const res = await fetch(`${API}/movies?title=${encodeURIComponent(search)}`);
+      const data = await res.json();
 
-  const list = document.getElementById("movies");
-  list.innerHTML = "";
+      const list = document.getElementById("movies");
+      list.innerHTML = "";
 
-  data.forEach(m => {
-    const li = document.createElement("li");
-    li.innerHTML = `
-      ${m.title} (${m.year})
-      <button onclick="deleteMovie('${m._id}')">X</button>
-    `;
-    list.appendChild(li);
-  });
-}
+      data.forEach(m => {
+        const li = document.createElement("li");
+        li.className = "movie-item";
+        li.innerHTML = `
+          <div class="movie-info">
+            <p class="movie-title">${m.title || "Sin título"}</p>
+            <p class="movie-year">${m.year || "Año desconocido"}</p>
+          </div>
+          <button class="delete-button" onclick="deleteMovie('${m._id}')">Eliminar</button>
+        `;
+        list.appendChild(li);
+      });
+    }
 
-async function addMovie() {
-  const title = document.getElementById("title").value;
-  const year = parseInt(document.getElementById("year").value);
+    async function addMovie() {
+      const title = document.getElementById("title").value.trim();
+      const year = parseInt(document.getElementById("year").value, 10);
 
-  await fetch(`${API}/movies`, {
-    method: "POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({
-      title,
-      year,
-      genres: [{ name: "Action" }]
-    })
-  });
+      if (!title || Number.isNaN(year)) {
+        alert('Escribe un título y un año válidos.');
+        return;
+      }
 
-  loadMovies();
-}
+      await fetch(`${API}/movies`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title,
+          year,
+          genres: [{ name: "Action" }]
+        })
+      });
 
-async function deleteMovie(id) {
-  await fetch(`${API}/movies/${id}`, { method: "DELETE" });
-  loadMovies();
-}
+      document.getElementById("title").value = "";
+      document.getElementById("year").value = "";
+      loadMovies();
+    }
 
-loadMovies();
-</script>
+    async function deleteMovie(id) {
+      await fetch(`${API}/movies/${id}`, { method: "DELETE" });
+      loadMovies();
+    }
 
+    loadMovies();
+  </script>
 </body>
 </html>
