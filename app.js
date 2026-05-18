@@ -2,12 +2,14 @@
 const express = require("express");
 const { MongoClient, ObjectId } = require("mongodb");
 const cors = require("cors");
+require("dotenv").config();
 
 const app = express();
 app.use(express.json());
 app.use(cors());
+app.use(express.static("."));
 
-const uri = "TU_URI_AQUI";
+const uri = process.env.MONGO_URI;
 const client = new MongoClient(uri);
 
 let db;
