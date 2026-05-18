@@ -1,0 +1,68 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>MovieStream</title>
+</head>
+<body>
+
+<h1>Movies</h1>
+
+<input id="search" placeholder="Buscar película">
+<button onclick="loadMovies()">Buscar</button>
+
+<ul id="movies"></ul>
+
+<h2>Agregar película</h2>
+<input id="title" placeholder="Title">
+<input id="year" placeholder="Year">
+<button onclick="addMovie()">Agregar</button>
+
+<script>
+const API = "http://localhost:3000";
+
+async function loadMovies() {
+  const search = document.getElementById("search").value;
+  const res = await fetch(`${API}/movies?title=${search}`);
+  const data = await res.json();
+
+  const list = document.getElementById("movies");
+  list.innerHTML = "";
+
+  data.forEach(m => {
+    const li = document.createElement("li");
+    li.innerHTML = `
+      ${m.title} (${m.year})
+      <button onclick="deleteMovie('${m._id}')">X</button>
+    `;
+    list.appendChild(li);
+  });
+}
+
+async function addMovie() {
+  const title = document.getElementById("title").value;
+  const year = parseInt(document.getElementById("year").value);
+
+  await fetch(`${API}/movies`, {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({
+      title,
+      year,
+      genres: [{ name: "Action" }]
+    })
+  });
+
+  loadMovies();
+}
+
+async function deleteMovie(id) {
+  await fetch(`${API}/movies/${id}`, { method: "DELETE" });
+  loadMovies();
+}
+
+loadMovies();
+</script>
+
+</body>
+</html>
