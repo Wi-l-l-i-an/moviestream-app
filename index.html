@@ -138,7 +138,8 @@
       margin: 0;
     }
 
-    .movie-year {
+    .movie-year,
+    .movie-genres {
       margin: 0;
       color: var(--muted);
       font-size: 0.95rem;
@@ -211,19 +212,13 @@
       <ul id="movies" class="movie-list"></ul>
     </div>
 
-    <div class="grid">
-      <div class="card">
-        <div class="section-title">Agregar película</div>
-        <div class="form-group">
-          <input id="title" placeholder="Título">
-          <input id="year" type="number" placeholder="Año">
-          <button onclick="addMovie()">Agregar película</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="section-title">Consejos rápidos</div>
-        <p>Usa el botón de búsqueda para filtrar por título. Las películas agregadas tienen un género por defecto <strong>Action</strong>, pero puedes ampliar el formulario si quieres agregar más campos.</p>
+    <div class="card">
+      <div class="section-title">Agregar película</div>
+      <div class="form-group">
+        <input id="title" placeholder="Título">
+        <input id="year" type="number" placeholder="Año">
+        <input id="genre" placeholder="Género (por ejemplo: Action)">
+        <button onclick="addMovie()">Agregar película</button>
       </div>
     </div>
 
@@ -244,10 +239,12 @@
       data.forEach(m => {
         const li = document.createElement("li");
         li.className = "movie-item";
+        const genres = Array.isArray(m.genres) ? m.genres.map(g => g.name).filter(Boolean).join(', ') : '';
         li.innerHTML = `
           <div class="movie-info">
             <p class="movie-title">${m.title || "Sin título"}</p>
             <p class="movie-year">${m.year || "Año desconocido"}</p>
+            <p class="movie-genres">${genres ? `Género: ${genres}` : 'Sin género'}</p>
           </div>
           <button class="delete-button" onclick="deleteMovie('${m._id}')">Eliminar</button>
         `;
@@ -258,6 +255,10 @@
     async function addMovie() {
       const title = document.getElementById("title").value.trim();
       const year = parseInt(document.getElementById("year").value, 10);
+      const genreInput = document.getElementById("genre").value.trim();
+      const genres = genreInput
+        ? genreInput.split(',').map(g => ({ name: g.trim() })).filter(g => g.name)
+        : [{ name: "Action" }];
 
       if (!title || Number.isNaN(year)) {
         alert('Escribe un título y un año válidos.');
@@ -270,12 +271,13 @@
         body: JSON.stringify({
           title,
           year,
-          genres: [{ name: "Action" }]
+          genres
         })
       });
 
       document.getElementById("title").value = "";
       document.getElementById("year").value = "";
+      document.getElementById("genre").value = "";
       loadMovies();
     }
 
